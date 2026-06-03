@@ -194,6 +194,11 @@ select {
   padding: 12px 14px;
 }
 
+select option {
+  background: #1f2937;
+  color: #fff;
+}
+
 button {
   border: none;
   border-radius: 14px;
