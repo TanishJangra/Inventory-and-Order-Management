@@ -13,8 +13,7 @@ node_modules/
 dist/
 
 # Docker
-**/Dockerfile*
-**/.dockerignore
+# Keep Dockerfiles and .dockerignore files in source control for builds and deployment.
 
 # VS Code
 .vscode/
