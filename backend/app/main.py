@@ -29,7 +29,7 @@ app = FastAPI(title="Inventory and Order Management API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://inventory-management.netlify.app"],
+    allow_origins=["https://inventoryandordermanagement.netlify.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
