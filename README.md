@@ -19,10 +19,10 @@ A full-stack containerized application with React frontend, FastAPI backend, and
 Example `.env` values:
 
 ```env
-POSTGRES_USER=inventory_admin
-POSTGRES_PASSWORD=TanKus_04262001
-POSTGRES_DB=inventory
-DATABASE_URL=postgresql://inventory_admin:TanKus_04262001@db:5432/inventory
+POSTGRES_USER=<your_username>
+POSTGRES_PASSWORD=<your_password>
+POSTGRES_DB=<db>
+DATABASE_URL=db_url
 PORT=8000
 VITE_API_URL=http://localhost:8000
 ```
@@ -46,7 +46,7 @@ docker compose up --build
 
 - Do not commit `.env` to GitHub.
 - `local.db` is used only for local SQLite fallback and should be ignored.
-- Backend uses PostgreSQL in Docker Compose via `DATABASE_URL=postgresql://inventory_admin:<password>@db:5432/inventory`.
+- Backend uses PostgreSQL in Docker Compose via `DATABASE_URL=db_url`.
 - Data is persisted in the PostgreSQL named volume `pgdata`.
 - Frontend uses `VITE_API_URL` to connect to the backend.
 
