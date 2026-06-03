@@ -30,6 +30,7 @@ function App() {
   const [orderData, setOrderData] = useState(initialOrder);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const lowStock = useMemo(
     () => products.filter((product) => product.quantity <= 5),
@@ -37,8 +38,17 @@ function App() {
   );
 
   useEffect(() => {
-    loadData();
+    withLoading(() => loadData());
   }, []);
+
+  async function withLoading(fn) {
+    setLoading(true);
+    try {
+      return await fn();
+    } finally {
+      setLoading(false);
+    }
+  }
 
   async function loadData() {
     try {
@@ -78,23 +88,25 @@ function App() {
     event.preventDefault();
     clearMessages();
     try {
-      const payload = {
-        name: productData.name,
-        sku: productData.sku,
-        price: Number(productData.price),
-        quantity: Number(productData.quantity),
-      };
+      await withLoading(async () => {
+        const payload = {
+          name: productData.name,
+          sku: productData.sku,
+          price: Number(productData.price),
+          quantity: Number(productData.quantity),
+        };
 
-      if (editProductId) {
-        await api.updateProduct(editProductId, payload);
-        setMessage("Product updated successfully.");
-      } else {
-        await api.createProduct(payload);
-        setMessage("Product created successfully.");
-      }
+        if (editProductId) {
+          await api.updateProduct(editProductId, payload);
+          setMessage("Product updated successfully.");
+        } else {
+          await api.createProduct(payload);
+          setMessage("Product created successfully.");
+        }
 
-      setProductData(initialProduct);
-      setEditProductId(null);
+        setProductData(initialProduct);
+        setEditProductId(null);
+      });
       await loadData();
     } catch (err) {
       setError(err.message);
@@ -122,9 +134,11 @@ function App() {
     event.preventDefault();
     clearMessages();
     try {
-      await api.createCustomer(customerData);
-      setCustomerData(initialCustomer);
-      setMessage("Customer created successfully.");
+      await withLoading(async () => {
+        await api.createCustomer(customerData);
+        setCustomerData(initialCustomer);
+        setMessage("Customer created successfully.");
+      });
       await loadData();
     } catch (err) {
       setError(err.message);
@@ -135,18 +149,20 @@ function App() {
     event.preventDefault();
     clearMessages();
     try {
-      const payload = {
-        customer_id: Number(orderData.customer_id),
-        items: orderData.items
-          .filter((item) => item.product_id && item.quantity)
-          .map((item) => ({
-            product_id: Number(item.product_id),
-            quantity: Number(item.quantity),
-          })),
-      };
-      await api.createOrder(payload);
-      setOrderData(initialOrder);
-      setMessage("Order placed successfully.");
+      await withLoading(async () => {
+        const payload = {
+          customer_id: Number(orderData.customer_id),
+          items: orderData.items
+            .filter((item) => item.product_id && item.quantity)
+            .map((item) => ({
+              product_id: Number(item.product_id),
+              quantity: Number(item.quantity),
+            })),
+        };
+        await api.createOrder(payload);
+        setOrderData(initialOrder);
+        setMessage("Order placed successfully.");
+      });
       await loadData();
     } catch (err) {
       setError(err.message);
@@ -157,8 +173,10 @@ function App() {
     if (!window.confirm("Delete this product?")) return;
     clearMessages();
     try {
-      await api.deleteProduct(id);
-      setMessage("Product deleted.");
+      await withLoading(async () => {
+        await api.deleteProduct(id);
+        setMessage("Product deleted.");
+      });
       await loadData();
     } catch (err) {
       setError(err.message);
@@ -169,8 +187,10 @@ function App() {
     if (!window.confirm("Delete this customer?")) return;
     clearMessages();
     try {
-      await api.deleteCustomer(id);
-      setMessage("Customer deleted.");
+      await withLoading(async () => {
+        await api.deleteCustomer(id);
+        setMessage("Customer deleted.");
+      });
       await loadData();
     } catch (err) {
       setError(err.message);
@@ -181,10 +201,12 @@ function App() {
     if (!window.confirm("Cancel this order?")) return;
     clearMessages();
     try {
-      await api.deleteOrder(id);
-      setMessage("Order cancelled.");
+      await withLoading(async () => {
+        await api.deleteOrder(id);
+        setMessage("Order cancelled.");
+        setSelectedOrder(null);
+      });
       await loadData();
-      setSelectedOrder(null);
     } catch (err) {
       setError(err.message);
     }
@@ -242,6 +264,7 @@ function App() {
       <main className="main-content">
         <header>
           <h2>{pageTitle}</h2>
+          {loading && <div className="alert info">Loading…</div>}
           {message && <div className="alert success">{message}</div>}
           {error && <div className="alert error">{error}</div>}
         </header>
