@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+env/
+venv/
+.env
+local.db
+
+# Node
+node_modules/
+dist/
+
+# Docker
+**/Dockerfile*
+**/.dockerignore
+
+# VS Code
+.vscode/
